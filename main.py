@@ -6,8 +6,10 @@ def scrape_pump_fun(address: str):
     symbol_pattern = re.compile("\((\w+?)\)")
     url = f"https://pump.fun/coin/{address.strip('/').strip()}"
     try:
+        if not address or not address.endswith("pump") or not (32 <= len(address) <= 44):
+            return {"error": "Address was wrong."}
         response = get(url, headers={'User-Agent': user_agent.generate_user_agent()})
-        response.raise_for_status()
+        # response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
     except Exception:
         return {"error": "Failed to fetch the page"}
