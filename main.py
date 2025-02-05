@@ -2,16 +2,18 @@ from requests import get
 from bs4 import BeautifulSoup
 import user_agent, re
 
-def scrape_pump_fun(address: str):
+def scrape_pump_fun(address: str, res: Response):
     symbol_pattern = re.compile("\((\w+?)\)")
     url = f"https://pump.fun/coin/{address.strip('/').strip()}"
     try:
         if not address or not address.endswith("pump") or not (32 <= len(address) <= 44):
+            res.status_code = 404
             return {"error": "Address was wrong."}
         response = get(url, headers={'User-Agent': user_agent.generate_user_agent()})
         # response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
     except Exception:
+        res.status_code = 503
         return {"error": "Failed to fetch the page"}
     
     try:
@@ -54,12 +56,17 @@ def scrape_pump_fun(address: str):
         "image": image.strip()
     }
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 
 app = FastAPI()
 
 @app.get("/pumpfun/{address}")
-def pump_fun(address: str, key: str):
+def pump_fun(address: str, key: str, res: Response):
     if key.lower().strip() != "gonecold":
+        res.status_code = 503
         return {"error": "Invalid Access-Key"}
     return scrape_pump_fun(address)
+
+@app.get("/ping")
+async def ping():
+    return {"ping": "pong"}
