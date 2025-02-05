@@ -61,7 +61,7 @@ from fastapi import FastAPI, Response
 app = FastAPI()
 
 @app.get("/pumpfun/{address}")
-def pump_fun(address: str, key: str, res: Response):
+def pump_fun(address: str, res: Response, key: str = "gonecold"):
     if key.lower().strip() != "gonecold":
         res.status_code = 503
         return {"error": "Invalid Access-Key"}
