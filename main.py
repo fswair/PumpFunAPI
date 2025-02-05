@@ -2,7 +2,7 @@ from requests import get
 from bs4 import BeautifulSoup
 import user_agent, re
 
-def scrape_pump_fun(address: str, res: Response):
+def scrape_pump_fun(address: str, res):
     symbol_pattern = re.compile("\((\w+?)\)")
     url = f"https://pump.fun/coin/{address.strip('/').strip()}"
     try:
@@ -65,7 +65,7 @@ def pump_fun(address: str, key: str, res: Response):
     if key.lower().strip() != "gonecold":
         res.status_code = 503
         return {"error": "Invalid Access-Key"}
-    return scrape_pump_fun(address)
+    return scrape_pump_fun(address, res)
 
 @app.get("/ping")
 async def ping():
